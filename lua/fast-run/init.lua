@@ -1,11 +1,12 @@
 local M = {}
 
 local config = require("fast-run.config")
-local runner = require("fast-run.runner")
 
 function M.setup(opts)
+	-- Cấu hình các ngôn ngữ hỗ trợ
 	config.setup(opts)
-	runner.register()
+	-- Đăng ký các autocmd và ánh xạ phím
+	require("fast-run.ui").register()
 end
 
 return M
