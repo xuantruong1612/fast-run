@@ -1,10 +1,7 @@
 local M = {}
 
 function M.enable()
-	-- Đặt keymap hoặc cấu hình plugin ở đây
-	vim.keymap.set("n", "<leader>t", function()
-		-- logic chạy file
-	end, { noremap = true, silent = true })
+	require("run_code.runner").setup()
 end
 
 return M

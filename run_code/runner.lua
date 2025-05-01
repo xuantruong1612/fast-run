@@ -1,3 +1,4 @@
+local terminal = require("run_code.terminal")
 local M = {}
 
 function M.setup()
@@ -26,11 +27,11 @@ function M.run_file()
 	elseif filetype == "javascript" or filetype == "js" then
 		cmd = string.format('node "%s"', fullpath)
 	else
-		print("No support file =))")
+		print("No support for this filetype =))")
 		return
 	end
 
-	require("plugins.run_code.terminal").open_terminal(cmd)
+	terminal.open_terminal(cmd)
 end
 
 return M
