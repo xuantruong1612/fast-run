@@ -20,15 +20,15 @@ function M.get_run_command()
 	end
 
 	-- Mặc định
-	if filetype == "c" then
-		return string.format(
-			'gcc -o "%s/%s" "%s" -lm -lpthread -ldl -lrt && "%s/%s"',
-			dir,
-			filename_noext,
-			fullpath,
-			dir,
-			filename_noext
-		)
+	-- if filetype == "c" then
+	-- 	return string.format(
+	-- 		'gcc -o "%s/%s" "%s" -lm -lpthread -ldl -lrt && "%s/%s"',
+	-- 		dir,
+	-- 		filename_noext,
+	-- 		fullpath,
+	-- 		dir,
+	-- 		filename_noext
+	-- 	)
 	elseif filetype == "cpp" then
 		return string.format('g++ -o "%s/%s" "%s" && "%s/%s"', dir, filename_noext, fullpath, dir, filename_noext)
 	elseif filetype == "python" then
