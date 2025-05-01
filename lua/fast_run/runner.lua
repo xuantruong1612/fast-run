@@ -29,8 +29,8 @@ function M.get_run_command()
 	-- 		dir,
 	-- 		filename_noext
 	-- 	)
-	elseif filetype == "cpp" then
-		return string.format('g++ -o "%s/%s" "%s" && "%s/%s"', dir, filename_noext, fullpath, dir, filename_noext)
+	-- elseif filetype == "cpp" then
+	-- 	return string.format('g++ -o "%s/%s" "%s" && "%s/%s"', dir, filename_noext, fullpath, dir, filename_noext)
 	elseif filetype == "python" then
 		return string.format('python3 "%s"', fullpath)
 	elseif filetype == "java" then
