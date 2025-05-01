@@ -8,15 +8,17 @@ function M.setup(opts)
 	runner.set_custom_commands(opts.custom_commands or {})
 
 	vim.keymap.set("n", "<leader>t", function()
-		if vim.fn.expand("%") == "" then
-			print("Buffer chưa được lưu vào file")
+		local filename = vim.fn.expand("%:p")
+		if filename == "" then
+			print("❌ Buffer chưa được lưu thành file!")
 			return
 		end
-		vim.cmd("w")
-		local cmd = runner.get_run_command()
 
+		vim.cmd("write")
+
+		local cmd = runner.get_run_command()
 		if not cmd then
-			print("No support file =))")
+			print("⚠️ Không hỗ trợ filetype này.")
 			return
 		end
 
