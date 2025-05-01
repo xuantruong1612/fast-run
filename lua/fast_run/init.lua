@@ -3,9 +3,12 @@ local term = require("fast_run.term_window")
 
 local M = {}
 
-function M.setup()
+function M.setup(opts)
+	opts = opts or {}
+	runner.set_custom_commands(opts.custom_commands or {})
+
 	vim.keymap.set("n", "<leader>t", function()
-		vim.cmd("w") -- lưu file
+		vim.cmd("w")
 		local cmd = runner.get_run_command()
 
 		if not cmd then
