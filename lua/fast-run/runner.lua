@@ -1,26 +1,18 @@
 local M = {}
-local supported_languages = {}
+local config = require("fast-run.config")
+local keymap = require("fast-run.keymap")
 
-function M.setup(opts)
-	opts = opts or {}
-	supported_languages = {}
-
-	if opts.enable and type(opts.enable) == "table" then
-		for _, lang in ipairs(opts.enable) do
-			supported_languages[lang] = true
-		end
-	end
-
-	-- Tạo autocmd theo từng filetype được enable
+function M.register()
 	vim.api.nvim_create_augroup("FastRunGroup", { clear = true })
 
-	for lang, _ in pairs(supported_languages) do
+	for lang, _ in pairs(config.supported_languages) do
 		vim.api.nvim_create_autocmd("FileType", {
 			group = "FastRunGroup",
 			pattern = lang,
 			callback = function()
 				vim.keymap.set("n", "<leader>t", function()
 					vim.cmd("w")
+
 					local filetype = vim.bo.filetype
 					local fullpath = vim.fn.expand("%:p")
 					local dir = vim.fn.expand("%:p:h")
@@ -53,16 +45,7 @@ function M.setup(opts)
 
 					vim.cmd(cmd)
 					vim.cmd("startinsert")
-
-					vim.api.nvim_buf_set_keymap(0, "n", "<CR>", ":q<CR>", { noremap = true, silent = true })
-					vim.api.nvim_buf_set_keymap(0, "t", "<Up>", "<C-\\><C-n><Up>", { noremap = true, silent = true })
-					vim.api.nvim_buf_set_keymap(
-						0,
-						"t",
-						"<Down>",
-						"<C-\\><C-n><Down>",
-						{ noremap = true, silent = true }
-					)
+					keymap.set_terminal_keymaps()
 				end, { noremap = true, silent = true, buffer = true })
 			end,
 		})
