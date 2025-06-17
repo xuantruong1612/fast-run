@@ -30,7 +30,7 @@
 1. Clone the plugin into the `~/.config/nvim/lua/fast-run` directory.
 
     ```bash
-    git clone https://github.com/your-plugin-repository.git ~/.config/nvim/lua/fast-run
+    git clone https://github.com/fast-run.git ~/.config/nvim/lua/fast-run
     ```
 
 2. In your `init.lua`, call the following configuration:
