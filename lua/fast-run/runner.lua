@@ -28,7 +28,6 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		return string.format('term %s "%s"', py, fullpath)
 
 	elseif filetype == "java" then
-		-- Dùng java class name không có .java
 		return string.format('term javac "%s" && cd "%s" && java "%s"', fullpath, dir, filename_noext)
 
 	elseif filetype == "javascript" or filetype == "js" then
