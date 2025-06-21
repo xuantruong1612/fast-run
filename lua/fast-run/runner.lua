@@ -24,28 +24,41 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		elseif is_macos then
 			return string.format('term clang -o "%s" "%s" -lm && "%s"', output_path, fullpath, output_path)
 		end
-	-------------------------------------------------------------------
+	-----------------------------------------------------------
 	elseif filetype == "cpp" then
 		return string.format('term g++ -o "%s" "%s" && "%s"', output_path, fullpath, output_path)
-	-------------------------------------------------------------------
+	-----------------------------------------------------------
 	elseif filetype == "python" then
 		local py = is_windows and "python" or "python3"
 		return string.format('term %s "%s"', py, fullpath)
-	-------------------------------------------------------------------
+	-----------------------------------------------------------
 	elseif filetype == "java" then
 		local src_dir = dir
 		local project_root = vim.fn.fnamemodify(src_dir, ":h")
-		local bin_path = project_root .. "/bin"
+		local bin_path
 		local src_path = project_root .. "/src"
-		return string.format(
-			[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
-			bin_path,
-			src_path,
-			bin_path,
-			bin_path,
-			filename_noext
-		)
-	-------------------------------------------------------------------
+		if vim.fn.isdirectory(src_path) == 1 then
+			bin_path = project_root .. "/bin"
+			return string.format(
+				[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
+				bin_path,
+				src_path,
+				bin_path,
+				bin_path,
+				filename_noext
+			)
+		else
+			bin_path = src_dir .. "/bin"
+			return string.format(
+				[[term mkdir -p "%s" && javac -d "%s" "%s" && java -cp "%s" "%s"]],
+				bin_path,
+				bin_path,
+				fullpath,
+				bin_path,
+				filename_noext
+			)
+		end
+	-----------------------------------------------------------
 	elseif filetype == "javascript" or filetype == "js" then
 		return string.format('term node "%s"', fullpath)
 	end
