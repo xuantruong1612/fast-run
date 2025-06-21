@@ -35,28 +35,34 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 	elseif filetype == "java" then
 		local src_dir = dir
 		local project_root = vim.fn.fnamemodify(src_dir, ":h")
-		local bin_path
 		local src_path = project_root .. "/src"
-		if vim.fn.isdirectory(src_path) == 1 then
-			bin_path = project_root .. "/bin"
-			return string.format(
-				[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
-				bin_path,
-				src_path,
-				bin_path,
-				bin_path,
-				filename_noext
-			)
+		local is_windows = vim.loop.os_uname().version:match("Windows")
+
+		if is_windows then
+			return string.format('term javac "%s" && cd "%s" && java "%s"', fullpath, dir, filename_noext)
 		else
-			bin_path = src_dir .. "/bin"
-			return string.format(
-				[[term mkdir -p "%s" && javac -d "%s" "%s" && java -cp "%s" "%s"]],
-				bin_path,
-				bin_path,
-				fullpath,
-				bin_path,
-				filename_noext
-			)
+			local bin_path
+			if vim.fn.isdirectory(src_path) == 1 then
+				bin_path = project_root .. "/bin"
+				return string.format(
+					[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
+					bin_path,
+					src_path,
+					bin_path,
+					bin_path,
+					filename_noext
+				)
+			else
+				bin_path = src_dir .. "/bin"
+				return string.format(
+					[[term mkdir -p "%s" && javac -d "%s" "%s" && java -cp "%s" "%s"]],
+					bin_path,
+					bin_path,
+					fullpath,
+					bin_path,
+					filename_noext
+				)
+			end
 		end
 	-----------------------------------------------------------
 	elseif filetype == "javascript" or filetype == "js" then
