@@ -15,21 +15,37 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		if is_windows then
 			return string.format('term gcc -o "%s" "%s" -lm -lpthread && "%s"', output_path, fullpath, output_path)
 		elseif is_linux then
-			return string.format('term gcc -o "%s" "%s" -lm -lpthread -ldl -lrt && "%s"', output_path, fullpath, output_path)
+			return string.format(
+				'term gcc -o "%s" "%s" -lm -lpthread -ldl -lrt && "%s"',
+				output_path,
+				fullpath,
+				output_path
+			)
 		elseif is_macos then
 			return string.format('term clang -o "%s" "%s" -lm && "%s"', output_path, fullpath, output_path)
 		end
-
+	-------------------------------------------------------------------
 	elseif filetype == "cpp" then
 		return string.format('term g++ -o "%s" "%s" && "%s"', output_path, fullpath, output_path)
-
+	-------------------------------------------------------------------
 	elseif filetype == "python" then
 		local py = is_windows and "python" or "python3"
 		return string.format('term %s "%s"', py, fullpath)
-
+	-------------------------------------------------------------------
 	elseif filetype == "java" then
-		return string.format('term javac "%s" && cd "%s" && java "%s"', fullpath, dir, filename_noext)
-
+		local src_dir = dir
+		local project_root = vim.fn.fnamemodify(src_dir, ":h")
+		local bin_path = project_root .. "/bin"
+		local src_path = project_root .. "/src"
+		return string.format(
+			[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
+			bin_path,
+			src_path,
+			bin_path,
+			bin_path,
+			filename_noext
+		)
+	-------------------------------------------------------------------
 	elseif filetype == "javascript" or filetype == "js" then
 		return string.format('term node "%s"', fullpath)
 	end
