@@ -10,7 +10,7 @@ local is_macos = os_name:find("darwin") ~= nil
 
 function M.get_run_command(filetype, fullpath, dir, filename_noext)
 	local output_path = string.format("%s/%s", dir, filename_noext)
-	------------------------------------------------------------
+	---------------------------------------------------------
 	if filetype == "c" then
 		if is_windows then
 			return string.format('term gcc -o "%s" "%s" -lm -lpthread && "%s"', output_path, fullpath, output_path)
@@ -24,14 +24,14 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		elseif is_macos then
 			return string.format('term clang -o "%s" "%s" -lm && "%s"', output_path, fullpath, output_path)
 		end
-	------------------------------------------------------------
+	---------------------------------------------------------
 	elseif filetype == "cpp" then
 		return string.format('term g++ -o "%s" "%s" && "%s"', output_path, fullpath, output_path)
-	------------------------------------------------------------
+	---------------------------------------------------------
 	elseif filetype == "python" then
 		local py = is_windows and "python" or "python3"
 		return string.format('term %s "%s"', py, fullpath)
-	------------------------------------------------------------
+	---------------------------------------------------------
 	elseif filetype == "java" then
 		-- Tự động lấy package từ đầu file
 		local lines = vim.api.nvim_buf_get_lines(0, 0, 10, false)
@@ -48,32 +48,28 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 
 		local src_dir = dir
 		local project_root = vim.fn.fnamemodify(src_dir, ":h")
-		local src_path = project_root .. "/src"
-		local test_path = project_root .. "/test"
 		local bin_path = project_root .. "/bin"
 
 		if is_windows then
 			return string.format(
-				[[term mkdir "%s" && powershell -Command "Get-ChildItem -Recurse -Filter *.java -Path '%s','%s' | ForEach-Object { $_.FullName } | javac -d '%s' -" && java -cp "%s" "%s"]],
+				[[term mkdir "%s" && powershell -Command "Get-ChildItem -Recurse -Filter *.java -Path '%s' | ForEach-Object { $_.FullName } | javac -d '%s' -" && java -cp "%s" "%s"]],
 				bin_path,
-				src_path,
-				test_path,
+				project_root,
 				bin_path,
 				bin_path,
 				classname
 			)
 		else
 			return string.format(
-				[[term mkdir -p "%s" && find "%s" "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
+				[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
 				bin_path,
-				src_path,
-				test_path,
+				project_root,
 				bin_path,
 				bin_path,
 				classname
 			)
 		end
-	------------------------------------------------------------
+	---------------------------------------------------------
 	elseif filetype == "javascript" or filetype == "js" then
 		return string.format('term node "%s"', fullpath)
 	end
