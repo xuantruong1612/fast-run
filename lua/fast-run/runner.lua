@@ -33,7 +33,7 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		return string.format('term %s "%s"', py, fullpath)
 	---------------------------------------------------------
 	elseif filetype == "java" then
-		-- Tự động lấy package từ đầu file
+		-- Lấy dòng package từ đầu file
 		local lines = vim.api.nvim_buf_get_lines(0, 0, 10, false)
 		local pkg = ""
 		for _, line in ipairs(lines) do
@@ -43,18 +43,24 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 				break
 			end
 		end
+
 		local file = vim.fn.expand("%:t:r")
 		local classname = pkg ~= "" and (pkg .. "." .. file) or file
+		local src_path = vim.fn.finddir("src", ".;")
+		if src_path == "" then
+			vim.notify("Không tìm thấy thư mục src/", vim.log.levels.ERROR)
+			return ""
+		end
 
-		local src_dir = dir
-		local project_root = vim.fn.fnamemodify(src_dir, ":h")
+		local src_abs = vim.fn.fnamemodify(src_path, ":p")
+		local project_root = vim.fn.fnamemodify(src_abs, ":h")
 		local bin_path = project_root .. "/bin"
 
 		if is_windows then
 			return string.format(
 				[[term mkdir "%s" && powershell -Command "Get-ChildItem -Recurse -Filter *.java -Path '%s' | ForEach-Object { $_.FullName } | javac -d '%s' -" && java -cp "%s" "%s"]],
 				bin_path,
-				project_root,
+				src_abs,
 				bin_path,
 				bin_path,
 				classname
@@ -63,7 +69,7 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 			return string.format(
 				[[term mkdir -p "%s" && find "%s" -name "*.java" | xargs javac -d "%s" && java -cp "%s" "%s"]],
 				bin_path,
-				project_root,
+				src_abs,
 				bin_path,
 				bin_path,
 				classname
