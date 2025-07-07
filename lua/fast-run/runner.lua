@@ -1,6 +1,5 @@
 local M = {}
 
--- System check
 local uname = vim.loop.os_uname()
 local os_name = uname.sysname:lower()
 
@@ -32,8 +31,25 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		local py = is_windows and "python" or "python3"
 		return string.format('term %s "%s"', py, fullpath)
 	---------------------------------------------------------
+	elseif filetype == "rust" then	
+		local cargo_toml_path = vim.fn.findfile("Cargo.toml", ".;")
+		if cargo_toml_path ~= "" then
+			local cargo_dir = vim.fn.fnamemodify(cargo_toml_path, ":h")
+			return string.format("term cd %s && cargo run", vim.fn.shellescape(cargo_dir))
+		else
+			if is_windows then
+				return string.format('term rustc "%s" -o "%s" && "%s"', fullpath, output_path, output_path)
+			else
+				return string.format(
+					"term rustc %s -o %s && %s",
+					vim.fn.shellescape(fullpath),
+					vim.fn.shellescape(output_path),
+					vim.fn.shellescape(output_path)
+				)
+			end
+		end
+	---------------------------------------------------------
 	elseif filetype == "java" then
-		-- Lấy dòng package từ đầu file
 		local lines = vim.api.nvim_buf_get_lines(0, 0, 10, false)
 		local pkg = ""
 		for _, line in ipairs(lines) do
