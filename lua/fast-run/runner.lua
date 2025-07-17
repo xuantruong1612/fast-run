@@ -9,6 +9,7 @@ local is_macos = os_name:find("darwin") ~= nil
 
 function M.get_run_command(filetype, fullpath, dir, filename_noext)
 	local output_path = string.format("%s/%s", dir, filename_noext)
+
 	---------------------------------------------------------
 	if filetype == "c" then
 		if is_windows then
@@ -23,15 +24,18 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 		elseif is_macos then
 			return string.format('term clang -o "%s" "%s" -lm && "%s"', output_path, fullpath, output_path)
 		end
+
 	---------------------------------------------------------
 	elseif filetype == "cpp" then
 		return string.format('term g++ -o "%s" "%s" && "%s"', output_path, fullpath, output_path)
+
 	---------------------------------------------------------
 	elseif filetype == "python" then
 		local py = is_windows and "python" or "python3"
 		return string.format('term %s "%s"', py, fullpath)
+
 	---------------------------------------------------------
-	elseif filetype == "rust" then	
+	elseif filetype == "rust" then
 		local cargo_toml_path = vim.fn.findfile("Cargo.toml", ".;")
 		if cargo_toml_path ~= "" then
 			local cargo_dir = vim.fn.fnamemodify(cargo_toml_path, ":h")
@@ -48,6 +52,7 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 				)
 			end
 		end
+
 	---------------------------------------------------------
 	elseif filetype == "java" then
 		local lines = vim.api.nvim_buf_get_lines(0, 0, 10, false)
@@ -91,9 +96,20 @@ function M.get_run_command(filetype, fullpath, dir, filename_noext)
 				classname
 			)
 		end
+
 	---------------------------------------------------------
 	elseif filetype == "javascript" or filetype == "js" then
 		return string.format('term node "%s"', fullpath)
+
+	---------------------------------------------------------
+	elseif filetype == "html" then
+		if is_windows then
+			return 'term start chrome "http://localhost:8080"'
+		elseif is_macos then
+			return 'term open -a "Google Chrome" "http://localhost:8080"'
+		elseif is_linux then
+			return 'term cmd.exe /C start chrome "http://localhost:8080"'
+		end
 	end
 
 	return nil
